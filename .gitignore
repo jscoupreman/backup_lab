@@ -1,0 +1,4 @@
+# Remove Vagrant specific temp host files and vagrant folder :
+*.swp
+.vagrant/**
+*.log
