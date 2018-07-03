@@ -1,0 +1,12 @@
+repo : https://github.com/backuppc/backuppc
+install doc : https://backuppc.github.io/backuppc/BackupPC.html#Installing-BackupPC
+
+Install perl modules :
+PERL_MM_USE_DEFAULT=1 cpan -i BackupPC::XS Archive::Zip XML::RSS CGI File::Listing Net::FTP Net::FTP::RetrHandle Net:: FTP::AutoReconnect
+
+Install rsync-bpc :
+git clone https://github.com/backuppc/rsync-bpc.git
+cd rsync-bpc
+./configure
+make -j 2
+make install
