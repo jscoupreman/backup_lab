@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |config|
 	config.vm.provider "virtualbox" do | v |
-		v.gui = false
+		v.gui = true
 	end
 	
 	##############################
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
 			apt -y update
 			apt -y upgrade
 			apt -y dist-upgrade
-			
+
 			apt install -y autoconf make g++ zlib1g-dev libcurl4-openssl-dev libcrypto++-dev libfuse-dev pkg-config
 			git clone https://github.com/uroni/urbackup_backend.git
 			cd urbackup_backend
@@ -71,17 +71,23 @@ Vagrant.configure("2") do |config|
 			autoreconf --install
 			./configure
 			make -j 4
-			sudo make install
+			make install
 
 			apt -y autoremove
 			
+			#commenting the following line generates a vagrant error on Windows
 			echo -e "[Unit]\nDescription=UrBackup Daemon\nAfter=network-online.target\n\n[Service]\nType=simple\nExecStart=/usr/local/bin/urbackupsrv run\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/urbackupsrv.service
 			systemctl enable urbackupsrv
 			systemctl start urbackupsrv
+
+			# Mount data point
+			mkdir /data
+			mkfs.ext4 /dev/sdc
+			echo -e '/dev/sdc /data ext4 defaults,auto 0 2' >> /etc/fstab
 
 			if [ -f /var/run/reboot-required ]; then
 				reboot
 			fi
 		SHELL
-	end	
+	end
 end
