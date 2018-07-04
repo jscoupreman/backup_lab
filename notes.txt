@@ -1,12 +1,50 @@
+BackupPC :
 repo : https://github.com/backuppc/backuppc
 install doc : https://backuppc.github.io/backuppc/BackupPC.html#Installing-BackupPC
 
-Install perl modules :
-PERL_MM_USE_DEFAULT=1 cpan -i BackupPC::XS Archive::Zip XML::RSS CGI File::Listing Net::FTP Net::FTP::RetrHandle Net:: FTP::AutoReconnect
+Install building tools :
+sudo apt install gcc make
 
-Install rsync-bpc :
-git clone https://github.com/backuppc/rsync-bpc.git
-cd rsync-bpc
-./configure
-make -j 2
+Install perl modules :
+$ sudo PERL_MM_USE_DEFAULT=1 cpan -i BackupPC::XS Archive::Zip CGI File::Listing Net::FTP Net::FTP::RetrHandle Net::FTP::AutoReconnect
+$ sudo apt install perl-doc
+
+Install parts :
+https://github.com/backuppc/backuppc-xs/releases
+tar zxvf BackupPC-XS-0.50.tar.gz
+cd BackupPC-XS-0.50
+perl Makefile.PL
+make
+make test
 make install
+
+https://github.com/backuppc/rsync-bpc/releases
+tar zxf rsync-bpc-3.0.9.5.tar.gz
+cd rsync-bpc-3.0.9.5
+./configure
+make
+make install
+
+https://github.com/backuppc/backuppc/releases
+tar zxf BackupPC-4.2.1.tar.gz
+cd BackupPC-4.2.1
+perl configure.pl
+
+
+
+
+UrBackup :
+https://www.urbackup.org
+https://www.urbackup.org/download.html#server_ubuntu
+https://github.com/uroni/urbackup_backend
+
+sudo apt install -y autoconf make gcc g++ zlib1g-dev libcurl4-openssl-dev libcrypto++-dev libfuse-dev pkg-config
+git clone https://github.com/uroni/urbackup_backend.git
+cd urbackup_backend
+./switch_build.sh server
+autoreconf --install
+./configure
+make [-j xx]
+sudo make install
+echo -e "[Unit]\nDescription=UrBackup Daemon\nAfter=network-online.target\n\n[Service]\nType=simple\nExecStart=/usr/local/bin/urbackupsrv run\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/urbackupsrv.service
+systemctl enable urbackupsrv
