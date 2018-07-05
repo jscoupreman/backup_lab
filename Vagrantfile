@@ -15,17 +15,17 @@ Vagrant.configure("2") do |config|
 	# Server Side :
 	##############################
 
-	config.vm.define "urbackupserver", autostart: true do | urbck |
-		urbck.vm.box = "ubuntu/bionic64"
-		urbck.vm.hostname = "urbackupserver"
-		urbck.vm.box_check_update = true
+	config.vm.define "urbackupserver", autostart: true do | urbck_server |
+		urbck_server.vm.box = "ubuntu/bionic64"
+		urbck_server.vm.hostname = "urbackupserver"
+		urbck_server.vm.box_check_update = true
 
 		#line = `VBoxManage list systemproperties | grep "Default machine folder"`
     	#vb_machine_folder = line.split(':')[1].strip()
     	#second_disk = File.join(vb_machine_folder, vb.name, 'disk2.vdi')
 		dataDisk = './backup_data.vmdk'
 
-		urbck.vm.provider "virtualbox" do | vb |
+		urbck_server.vm.provider "virtualbox" do | vb |
 			vb.customize ["modifyvm", :id, "--cpus", 4]
 			vb.customize ["modifyvm", :id, "--memory", 8196]
 			# Building disk files if they don't exist
@@ -36,10 +36,10 @@ Vagrant.configure("2") do |config|
 				vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', dataDisk]
 			end
 		end
-		urbck.vm.network "forwarded_port", guest: 55414, host: 55414
-		urbck_win10.vm.network "private_network", type: "dhcp"
+		urbck_server.vm.network "forwarded_port", guest: 55414, host: 55414
+		urbck_server.vm.network "private_network", type: "dhcp"
 
-		urbck.vm.provision "shell", inline: <<-SHELL
+		urbck_server.vm.provision "shell", inline: <<-SHELL
 			apt -y update
 			apt -y upgrade
 			apt -y dist-upgrade
