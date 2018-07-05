@@ -54,36 +54,5 @@ sudo mkfs.ext4 /dev/sdc
 (check with lsblk)
 
 
-
-
-
-
-
-			#apt -y update
-			#apt -y upgrade
-			#apt -y dist-upgrade
-			
-			#apt install -y autoconf make g++ zlib1g-dev libcurl4-openssl-dev libcrypto++-dev libfuse-dev pkg-config
-			#git clone https://github.com/uroni/urbackup_backend.git
-			#cd urbackup_backend
-			#./switch_build.sh server
-			#autoreconf --install
-			#./configure
-			#make -j 4
-			#sudo make install
-
-			#apt -y autoremove
-			
-			#echo -e "[Unit]\nDescription=UrBackup Daemon\nAfter=network-online.target\n\n[Service]\nType=simple\nExecStart=/usr/local/bin/urbackupsrv run\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/urbackupsrv.service
-			#systemctl enable urbackupsrv
-			#systemctl start urbackupsrv
-
-			# Mount data point
-			#sudo mkdir /data
-			#mount /dev/sdc /data
-
-			#sudo echo -e '/dev/sdc /data ext4 defaults,auto 0 2' >> /etc/fstab
-
-			#if [ -f /var/run/reboot-required ]; then
-			#	reboot
-			#fi
+Client side Windows :
+https://hndl.urbackup.org/Server/2.2.11/UrBackup%20Server%202.2.11%28x64%29.msi

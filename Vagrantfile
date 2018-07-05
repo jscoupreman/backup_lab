@@ -2,44 +2,22 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+	config.vm.synced_folder ".", "/vagrant", disabled: true
 	config.vm.provider "virtualbox" do | v |
-		v.gui = true
+		v.gui = false
 	end
 	
 	##############################
 	# Custom configuration :
 	##############################
-	
-	config.vm.define "backuppc", autostart: false do | bpc |
-		bpc.vm.box = "ubuntu/bionic64"
-		bpc.vm.hostname = "backuppc"
-		bpc.vm.box_check_update = true
 
+	##############################
+	# Server Side :
+	##############################
 
-		bpc.vm.provider "virtualbox" do | vb |
-			vb.customize ["modifyvm", :id, "--cpus", 6]
-			vb.customize ["modifyvm", :id, "--memory", 8196]
-			
-		end
-
-		bpc.vm.provision "shell", inline: <<-SHELL
-			apt -y update
-			apt -y upgrade
-			apt -y dist-upgrade
-			
-			# apt -y install backuppc
-
-			apt -y autoremove
-			
-			if [ -f /var/run/reboot-required ]; then
-				reboot
-			fi
-		SHELL
-	end	
-	
-	config.vm.define "urbackup", autostart: true do | urbck |
+	config.vm.define "urbackupserver", autostart: true do | urbck |
 		urbck.vm.box = "ubuntu/bionic64"
-		urbck.vm.hostname = "UrBackup"
+		urbck.vm.hostname = "urbackupserver"
 		urbck.vm.box_check_update = true
 
 		#line = `VBoxManage list systemproperties | grep "Default machine folder"`
@@ -53,12 +31,14 @@ Vagrant.configure("2") do |config|
 			# Building disk files if they don't exist
 			if not File.exists?(dataDisk)
 				#vb.customize ['createhd', '--filename', dataDisk, '--variant', 'Fixed', '--size', 10 * 1024] #10GB
-				vb.customize ['createmedium', 'disk', '--filename', dataDisk, '--format', 'VMDK', '--size', 10 * 1024] #10GB
+				vb.customize ['createmedium', 'disk', '--filename', dataDisk, '--format', 'VMDK', '--size', 200 * 1024] #200GB
 				#vb.customize ['storagectl', :id, '--name', 'SATA Controller', '--add', 'sata', '--portcount', 4]
 				vb.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', dataDisk]
 			end
 		end
 		urbck.vm.network "forwarded_port", guest: 55414, host: 55414
+		urbck_win10.vm.network "private_network", type: "dhcp"
+
 		urbck.vm.provision "shell", inline: <<-SHELL
 			apt -y update
 			apt -y upgrade
@@ -82,6 +62,7 @@ Vagrant.configure("2") do |config|
 
 			# Mount data point
 			mkdir /data
+			chown urbackup: /data
 			mkfs.ext4 /dev/sdc
 			echo -e '/dev/sdc /data ext4 defaults,auto 0 2' >> /etc/fstab
 
@@ -90,4 +71,44 @@ Vagrant.configure("2") do |config|
 			fi
 		SHELL
 	end
+
+	##############################
+	# Client Side :
+	##############################
+
+	config.vm.define "urbackupClientLinux", autostart: false do | urbck_linux |
+		urbck_linux.vm.box = "ubuntu/bionic64"
+		urbck_linux.vm.hostname = "urbackupClientLinux"
+		urbck_linux.vm.box_check_update = true
+		urbck_linux.vm.network "private_network", type: "dhcp"
+		urbck_linux.vm.provision "shell", inline: <<-SHELL
+			apt -y update
+			apt -y upgrade
+			apt -y dist-upgrade
+
+
+
+			apt -y autoremove
+
+			if [ -f /var/run/reboot-required ]; then
+				reboot
+			fi
+		SHELL
+	end
+
+	config.vm.define "urbackupClientWin2016", autostart: false do | urbck_win2016 |
+		urbck_win2016.vm.box = "mwrock/Windows2016"
+		urbck_win2016.vm.hostname = "urbackupClientWin2016"
+		urbck_win2016.vm.box_check_update = true
+		urbck_win2016.vm.network "private_network", type: "dhcp"
+	end
+
+	config.vm.define "urbackupClientWin10", autostart: true do | urbck_win10 |
+		urbck_win10.vm.box = "Microsoft/EdgeOnWindows10"
+		urbck_win10.vm.hostname = "urbackupClientWin10"
+		urbck_win10.vm.box_check_update = true
+		urbck_win10.vm.network "private_network", type: "dhcp"
+		urbck_win10.vm.guest = :windows
+	end
+
 end
