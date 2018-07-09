@@ -115,14 +115,14 @@ Vagrant.configure("2") do |config|
 		SHELL
 	end
 
-	config.vm.define "urbackupClientWin2012R2", autostart: false do | urbck_win2012R2 |
+	config.vm.define "urbackupClientWin2012R2", autostart: true do | urbck_win2012R2 |
 		urbck_win2012R2.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
 		urbck_win2012R2.vm.hostname = "urbackupClientWin2012R2"
 		urbck_win2012R2.vm.box_check_update = true
 		urbck_win2012R2.vm.network "private_network", ip: "10.0.0.12"
 	end
 
-	config.vm.define "urbackupClientWin2016", autostart: false do | urbck_win2016 |
+	config.vm.define "urbackupClientWin2016", autostart: true do | urbck_win2016 |
 		urbck_win2016.vm.box = "mwrock/Windows2016"
 		urbck_win2016.vm.hostname = "urbackupClientWin2016"
 		urbck_win2016.vm.box_check_update = true
