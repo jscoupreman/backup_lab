@@ -67,13 +67,12 @@ Vagrant.configure("2") do |config|
 
 			# Mount data point
 			mkdir /data
-			chown urbackup: /data
 			mkfs.ext4 /dev/sdc
 			echo -e '/dev/sdc /data ext4 defaults,auto 0 2' >> /etc/fstab
-
-			if [ -f /var/run/reboot-required ]; then
+			#if [ -f /var/run/reboot-required ]; then
 				reboot
-			fi
+				chown urbackup: /data
+			#fi
 		SHELL
 	end
 
@@ -129,13 +128,18 @@ Vagrant.configure("2") do |config|
 		urbck_win2016.vm.network "private_network", ip: "10.0.0.13"
 	end
 
-	config.vm.define "urbackupClientWin10", autostart: false do | urbck_win10 |
+	config.vm.define "urbackupClientWin10", autostart: true do | urbck_win10 |
 		urbck_win10.vm.box = "Microsoft/EdgeOnWindows10"
 		urbck_win10.vm.hostname = "urbackupClientWin10"
 		urbck_win10.vm.box_check_update = true
 		urbck_win10.vm.network "private_network", ip: "10.0.0.14"
-		urbck_win10.vm.guest = :windows
-		urbck_win10.vm.communicator = :winrm
 	end
+
+	#config.vm.define "urbackupClientWin7", autostart: false do | urbck_win7 |
+	#	urbck_win7.vm.box = "opentable/win-7-professional-amd64-nocm"
+	#	urbck_win7.vm.hostname = "urbackupClientWin7"
+	#	urbck_win7.vm.box_check_update = true
+	#	urbck_win7.vm.network "private_network", ip: "10.0.0.15"
+	#end
 
 end
