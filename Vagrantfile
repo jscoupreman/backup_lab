@@ -102,10 +102,12 @@ Vagrant.configure("2") do |config|
 			make -j 2
 			make install
 
+			# Config example :
+			urbackupclientctl add-backupdir -s -r -f --path /etc -n etc
+
 			cp urbackupclientbackend-debian.service /etc/systemd/system/
 			systemctl enable urbackupclientbackend-debian.service
 			cp defaults_client /etc/default/urbackupclient
-			cp defaults_server /etc/default/urbackupsrv
 			systemctl start urbackupclientbackend-debian
 
 			if [ -f /var/run/reboot-required ]; then
@@ -134,12 +136,5 @@ Vagrant.configure("2") do |config|
 		urbck_win10.vm.box_check_update = true
 		urbck_win10.vm.network "private_network", ip: "10.0.0.14"
 	end
-
-	#config.vm.define "urbackupClientWin7", autostart: false do | urbck_win7 |
-	#	urbck_win7.vm.box = "opentable/win-7-professional-amd64-nocm"
-	#	urbck_win7.vm.hostname = "urbackupClientWin7"
-	#	urbck_win7.vm.box_check_update = true
-	#	urbck_win7.vm.network "private_network", ip: "10.0.0.15"
-	#end
 
 end
